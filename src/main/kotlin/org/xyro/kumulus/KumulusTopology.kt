@@ -308,7 +308,9 @@ class KumulusTopology(
                                 ),
                         )
                         try {
-                            c.execute(message.tuple)
+                            message.tuple.otelContext.makeCurrent().use {
+                                c.execute(message.tuple)
+                            }
                         } finally {
                             MDC.clear()
                         }

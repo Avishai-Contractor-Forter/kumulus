@@ -1,6 +1,7 @@
 package org.xyro.kumulus.collector
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.opentelemetry.context.Context
 import org.apache.storm.grouping.CustomStreamGrouping
 import org.apache.storm.tuple.Tuple
 import org.apache.storm.utils.Utils
@@ -56,6 +57,7 @@ abstract class KumulusCollector<T : KumulusComponent>(
         val ret = mutableListOf<Int>()
 
         val loggingContext = buildLoggingContext(streamId, messageId)
+        val otelContext = Context.current()
         var executes: List<Pair<KumulusComponent, KumulusTuple>> = listOf()
 
         component.groupingStateMap[streamId]?.let { streamTargets: Map<String, CustomStreamGrouping> ->
@@ -75,6 +77,7 @@ abstract class KumulusCollector<T : KumulusComponent>(
                                     tuple,
                                     messageId,
                                     loggingContext,
+                                    otelContext,
                                 )
                             acker.expandTrees(component, destComponent.taskId, kumulusTuple)
                             destComponent to kumulusTuple
